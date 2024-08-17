@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<!--  by AlbertZ -->
+
+    <head>
+        <title>花寻</title>
+        <meta charset="UTF-8">
+        <meta name="keywords" content="花寻,植物学,植物,花,答题,植物分类">
+        <meta name="description" content="花寻 flower-search">
+        <meta name="author" content="Albert Z">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <link rel="shortcut icon" href="" type="image/x-icon"> -->
+        <!-- <link rel="bookmark" href="" type="image/x-icon"> -->
+        <link rel="stylesheet" href="static/index.css" />
+        <!--<link rel="stylesheet" href="static/mdui@2.css">-->
+        <link rel="stylesheet" href="https://unpkg.com/mdui@2/mdui.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <!--<script src="static/mdui@2.js"></script>-->
+        <!--<script src="static/jquery.min.js"></script>-->
+        <script src="https://unpkg.com/mdui@2/mdui.global.js"></script>
+        <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src="static/fams.js"></script>
+        <script>
+            function loadStyle(url) {
+                var link = document.createElement('link')
+                link.type = 'text/css'
+                link.rel = 'stylesheet'
+                link.href = url
+                var head = document.getElementsByTagName('head')[0]
+                head.appendChild(link)
+            }
+            // 移动端适应
+            var moblie = navigator.userAgent.match(/(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i);
+            if (moblie) {
+                loadStyle('static/mobile.css');
+            }
+        </script>
+        <style>
+            html,body{ overflow: scroll;}
+            html::-webkit-scrollbar, body::-webkit-scrollbar{height:0px;}
+            body{margin:0;}
+        </style>
+    </head>
+    <body class="mdui-theme-accent-indigo">
+        <div class="container">
+            <div id="div-main">
+                <div id="div-img">
+                    <img id="img"alt="Please wait..." />
+                    <mdui-circular-progress id="loading"></mdui-circular-progress>
+                </div>
+                <div id="div-q">
+                    <div id="question">
+                        <span>图中植物所属科为</span> 
+                        <sup><mdui-button-icon icon="help" id="ico-help" href="javascript:aboutDialog();"></mdui-button-icon></sup>
+                    </div>
+                    <div id="options"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            
+
+            // 全局变量
+            var n = Math.round((document.body.clientHeight - 250) / (45 + 17));
+            var ans = -1;
+            var fam = '';
+            var des = '';
+            var int = null;
+
+            if (moblie) {
+                n -= 3;
+                if (document.body.clientHeight >= 800)
+                n -= 1;
+            }
+            // 按键布局
+            for (let i=0; i<n; i++) {
+                $('#options').append(`
+                <div class="btn-box">
+                    <mdui-button full-width class="btn" id="btn-${i}" onclick="checkAnswer(${i})"></mdui-button>
+                    <mdui-icon id="ico-${i}" class="btn-icon"></mdui-icon>
+                </div>`);
+            }
+
+            function queryImage(loading=false) {
+                let i = 0;
+                int = setInterval( () => {
+                    $('#img').css('filter', `blur(${i}px)`);
+                    i++;
+                }, 100);
+                if (loading) $('#loading').show();
+                $.ajax({
+                    url: 'https://1308859096-7axybdfofu-sh.scf.tencentcs.com/query-image',
+                    type: 'get',
+                    dataType: 'jsonp',
+                    jsonp: 'callback',
+                    jsonpCallback: 'requestSuccess',
+                });
+            };
+
+            function requestSuccess(res) {
+                $('#img').attr('src', 'data:;base64, '+res.img);
+                fam = res.des.match(/title=(.*?科)/)[1];
+                des = res.des;
+                let tmp = fams.slice(0, fams.indexOf(fam)).concat(fams.slice(fams.indexOf(fam)+1));
+                tmp = getRandomArrayElements(tmp, n-1);
+                tmp = randomInsert([fam, ], tmp);
+                var opts = tmp[0];
+                ans = tmp[1];
+                for (let i=0; i<n; i++) {
+                    $(`#btn-${i}`).html(opts[i]);
+                }
+                $('#img').show();
+                clearInterval(int);
+                $('#img').css('filter', 'none');
+                if (loading) $('#loading').hide();
+            }
+
+            function getRandomArrayElements(arr, count) {
+                var shuffled = arr.slice(0), i = arr.length, min = i - count, temp, index;  //只是声明变量的方式, 也可以分开写
+                while (i-- > min) {
+                    //console.log(i);
+                    index = Math.floor((i + 1) * Math.random()); //这里的+1 是因为上面i--的操作  所以要加回来
+                    temp = shuffled[index];  //即值交换
+                    shuffled[index] = shuffled[i]; 
+                    shuffled[i] = temp;
+                    //console.log(shuffled);
+                }
+                return shuffled.slice(min);
+            }
+
+            function randomInsert(arr1, arr2) {
+                arr1.forEach(value => {
+                    x = Math.round(Math.random() * arr2.length)
+                    arr2.splice(x, 0, value)})
+                return [arr2, x];
+            }
+
+            function checkAnswer(n) {
+                if (n!=ans) {
+                    $(`#ico-${n}`).attr('name', 'close');
+                    $(`#ico-${n}`).show();
+                    setTimeout(() => {
+                        $(`#ico-${n}`).hide();
+                    }, 500);
+                    return;
+                }
+                $(`#ico-${n}`).attr('name', 'done');
+                $(`#ico-${n}`).show();
+                setTimeout(() => {
+                    $(`#ico-${n}`).hide();
+                    mdui.dialog({
+                        headline: "回答正确",
+                        body: "图中植物的详细分类为" + des,
+                        closeOnOverlayClick: true,
+                        actions: [
+                            {
+                            text: "关闭",
+                            },
+                            {
+                            text: "OK",
+                            onClick: () => {
+                                queryImage();
+                            }
+                            }
+                        ]
+                    });
+                }, 500);
+                
+            }
+
+            function aboutDialog() {
+                mdui.dialog({
+                    headline: "关于花寻 Flower-Search",
+                    body: `
+                    <p><b>作者:</b>      Albert</p>
+                    <p><b>版本:</b>      1.0.1</p>
+                    <p><b>API:</b>       基于Flask框架的随机图片及分类单元API（支持jsonp） <a href="https://1308859096-7axybdfofu-sh.scf.tencentcs.com/query-image">https://1308859096-7axybdfofu-sh.scf.tencentcs.com/query-image</a></p>
+                    <p><b>敬请期待:</b>   由合作者 @entropy 提供的植物分类知识和彩蛋
+                    `,
+                    closeOnOverlayClick: true,
+                    actions: [
+                        {
+                        text: "OK",
+                        },
+                    ]
+                });
+            }
+
+            onload = () => {
+                queryImage(loading=true);
+            };
+            $('#div-img').on('click', () => {
+                queryImage();
+            })
+        </script>
+    </body>
+</html>

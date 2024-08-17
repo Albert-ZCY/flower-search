@@ -1,0 +1,28 @@
+#div-main {
+    flex-direction: column;
+    justify-content: center;
+}
+
+#div-img {
+    width: 100%;
+    height: 35vh;
+}
+
+#div-q {
+    width: 90%;
+    height: 65vh;
+    margin: 5%;
+}
+
+#loading {
+    margin-top: 12vh;
+    margin-left: 40vw;
+}
+
+#question {
+    margin: 20px;
+}
+
+body {
+    height: 100vh;
+}

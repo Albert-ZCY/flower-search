@@ -1,0 +1,91 @@
+mdui-button {
+    background-color: #66CDAA;
+    height: 45px;
+    font-size: 18px;
+    color: white;
+}
+
+.btn {
+    width: 100%;
+}
+
+#img {
+    float:left;
+    height: 100%; 
+    width: 100%;
+    display: none;
+}
+
+#question {
+    font-size: 22px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+a:link {
+    text-decoration: none;
+    color: #888;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #888;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+#loading {
+    display: none;
+    z-index: 1000;
+    float: left;
+    margin-top: 40vh;
+    margin-left: 30vw;
+}
+
+#div-main {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+#div-img {
+    display: -webkit-flex;
+    display: flex;
+    height: 100vh; 
+    width: 67vw;
+    float: left;
+}
+
+#div-q {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+    width: 25vw;
+    margin-left: 4vw;
+}
+
+.btn-box {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    display:flex;
+    align-items: center;
+}
+
+.btn-icon {
+    z-index: 5;
+    margin-left:-40px;
+    display: none;
+    color: white;
+}
+
+#ico-help {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+}
